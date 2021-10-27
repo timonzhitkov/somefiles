@@ -1,0 +1,59 @@
+FROM php:8.0-fpm
+
+WORKDIR /app/backend
+
+RUN mkdir -p /app/images/le/original && \
+    mkdir -p /app/images/le/small && \
+    mkdir -p /app/money_images/fk/original && \
+    mkdir -p /app/money_images/fk/small
+
+RUN chmod 777 /app/images/le/original && \
+    chmod 777 /app/images/le/small && \
+    chmod 777 /app/money_images/fk/original && \
+    chmod 777 /app/money_images/fk/small
+
+RUN apt-get update && apt-get install -y openssl curl
+
+RUN apt-get update && apt-get install -y --no-install-recommends zlib1g-dev libssl-dev libzip-dev libmagickwand-dev libmemcached-dev libonig-dev libpq-dev libmcrypt-dev
+
+RUN docker-php-ext-install zip && \
+    docker-php-ext-install gd && \
+    docker-php-ext-install mbstring && \
+    docker-php-ext-install exif && \
+    docker-php-ext-install xml simplexml && \
+    docker-php-ext-install pdo && \
+    docker-php-ext-install pdo_mysql && \
+    docker-php-ext-install mysqli
+
+RUN docker-php-ext-configure opcache --enable-opcache \
+    && docker-php-ext-install opcache
+
+RUN mkdir -p /usr/src/php/ext/imagick; \
+    curl -fsSL https://github.com/Imagick/imagick/archive/06116aa24b76edaf6b1693198f79e6c295eda8a9.tar.gz | tar xvz -C "/usr/src/php/ext/imagick" --strip 1; \
+    docker-php-ext-install imagick;
+
+RUN pecl install memcache && docker-php-ext-enable memcache
+
+ENV BACKEN_ID="1"
+ENV PRODUCTION="0"
+ENV EMAIL_REVERT="1"
+ENV BACKTRACE="0"
+
+ENV DB_HOST="mysql"
+ENV DB_HOST_READ="mysql"
+ENV DB_NAME="finuslugi"
+ENV DB_NAME2="fin_insurance"
+ENV DB_USER="root"
+ENV DB_PASSWORD="root"
+
+ENV CHAT_URL="//chat.finuslugi.ru/assets/js/webchat_main"
+ENV CHAT_STYLE="//chat.finuslugi.ru/assets/css/webchat_main"
+ENV LK_URL="//lk.finuslugi.ru"
+ENV OSAGO_URL="//osago.finuslugi.ru"
+ENV SITEMAP_BASE="https://finuslugi.ru"
+
+ENV MC_HOST="memcached"
+ENV MC_PORT=11211
+ENV MC_DB="fin"
+
+ENV NOCACHE=0

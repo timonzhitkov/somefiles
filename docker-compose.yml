@@ -1,0 +1,38 @@
+version: "3.3"
+services:
+  nginx:
+    build:
+        context: .
+        dockerfile: Dockerfile-nginx
+    volumes:
+      - ./../fin_office/:/app/fin_office
+    ports:
+      - 8000:80
+
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile-php
+    volumes:
+      - ./../core/:/app/core/
+      - ./../fin_backend/:/app/fin_backend/
+      - ./../import_scripts/:/app/import_scripts/
+    working_dir: /app
+
+  mysql:
+
+    build:
+      context: .
+      dockerfile: Dockerfile-mysql
+    volumes:
+      - ./mysql/dump/:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+
+  memcached:
+    image: memcached:latest
+
+  adminer:
+    image: adminer
+    ports:
+        - 8001:8080
